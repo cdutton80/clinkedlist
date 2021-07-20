@@ -479,3 +479,62 @@ CSList * CSList_intersperse2_ref(CSList * list1, CSList * list2) {
 		}	
 	}
 }
+
+CPointer CSList_minimum_value(CSList * list, int (*f)(CPointer, CPointer)) {
+	if (list == NULL || CSList_empty(list)) {
+		return NULL;
+	}
+	else {
+		CPointer smallest = list->head->value;
+		
+		for (CSNode * cur = list->head->next; cur != NULL; cur = cur->next) {
+			if (f(cur->value, smallest) == -1) {
+				smallest = cur->value;
+			}
+		}
+		
+		return smallest;
+	}
+}
+
+CPointer CSList_maximum_value(CSList * list, int (*f)(CPointer, CPointer)) {
+	if (list == NULL || CSList_empty(list)) {
+		return NULL;
+	}
+	else {
+		CPointer largest = list->head->value;
+		
+		for (CSNode * cur = list->head->next; cur != NULL; cur = cur->next) {
+			if (f(cur->value, largest) == 1) {
+				largest = cur->value;
+			}
+		}
+		
+		return largest;
+	}
+}
+
+CSList * CSList_sort(CSList * list, int (*f)(CPointer, CPointer)) {
+	return list;
+}
+
+int CSList_has(CSList * list, int (*f)(CPointer)) {
+	if (list == NULL || CSList_empty(list)) {
+		return 0;
+	}
+	else {
+		for (CSNode * cur = list->head; cur != NULL; cur = cur->next) {
+			if (f(cur->value)) {
+				return 1;
+			}
+		}
+		
+		return 0;
+	}
+}
+
+CSList * CSList_uniq(CSList * list, int (*f)(CPointer, CPointer)) {
+	CSList * result = CSList_alloc(list->value_size);
+	
+	return result;
+}
