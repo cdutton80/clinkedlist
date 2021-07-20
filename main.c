@@ -13,41 +13,38 @@ void print_intint_tuple(CPointer val);
 void print_intflt_tuple(CPointer val);
 CPointer int_add(CPointer init, CPointer x);
 CPointer times2_plus1_div2(CPointer val);
+void printi_2int(CPointer v1, CPointer v2, int i);
 
 
 int main(void) {
-    int zero = 0;
+    // int zero = 0;
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
     CSList * lst = CSList_alloc(sizeof(int));
+    CSList * lst2 = CSList_alloc(sizeof(int));
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 4; i++) {
         CSList_append_ref(lst, &arr[i]);
     }
 
-	CSList * map = CSList_map_ref(lst, sizeof(int), times_two_plus_one);
-    CSList * zip = CSList_zip2_ref(lst, map);
-    CSList * cpy = CSList_copy_nodes_and_values(lst);
-
-    CSList * map2 = CSList_map_ref(lst, sizeof(float), times2_plus1_div2);
-    CSList * zip2 = CSList_zip2_ref(lst, map2);
-
-    int ** arr2 = (int **)CSList_to_array_of_pointers(CSList_reverse_ref(lst));
-    for (int i = 0; i < 8; i++) {
-        fprintf(stdout, "arr2[%d] = %d\n", i, *arr2[i]);
+    for (int i = 4; i < 8; i++) {
+        CSList_append_ref(lst2, &arr[i]);
     }
     
-    fprintf(stdout, "len: %d\n", CSList_length(lst));
+    CSList * lst3 = CSList_intersperse2_ref(lst2, lst);
     
-    CSList_iter(zip, print_intint_tuple);
-    CSList_iter(zip2, print_intflt_tuple);
-
-    fprintf(stdout, "sum = %d\n", *(int *)CSList_reduce_ref(cpy, &zero, sizeof(int), int_add));
+    // CSList_iter(lst3, print_int);
     
-    // C2Tuple * t = zip->head->value;
+    // CSList_iter2i(lst, lst2, printi_2int);
     
-    CSList_free_nodes_and_values(zip);
-    free(zip);
+    CSList * m = CSList_find_first_n_ref(lst3, 4, gt_two);
+    
+    CSList_rev_iter(m, print_intint_tuple);
+    
+    // CSList_iter_where(lst3, print_int, gt_two);
+    
+    C2Tuple * f = CSList_find_first_ref(lst3, gt_two);
+    print_intint_tuple(f);
 }
 
 void print_int(CPointer val) {
@@ -93,4 +90,8 @@ CPointer times2_plus1_div2(CPointer val) {
     float * result = malloc(sizeof(float));
     *result = (float)(*(int *)val * 2 + 1) / 2.0;
     return result;
+}
+
+void printi_2int(CPointer v1, CPointer v2, int i) {
+	fprintf(stdout, "%3d: %d, %d\n", i, *(int *)v1, *(int *)v2);
 }
