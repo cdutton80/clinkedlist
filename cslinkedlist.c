@@ -158,6 +158,64 @@ void CSList_append_ref(CSList * list, CPointer val) {
     }
 }
 
+CSList * CSList_find_ref(CSList * list, int (*f)(CPointer)) {
+	CSList * result = CSList_alloc(sizeof(C2Tuple));
+	
+	CSNode * cur;
+	int index;
+	
+	for (index = 0, cur = list->head; cur != NULL; index++, cur = cur->next) {
+		if (f(cur->value)) {
+			int * i = malloc(sizeof(int));
+			*i = index;
+			C2Tuple * match = malloc(sizeof(C2Tuple));
+			match->fst = i;
+			match->snd = cur->value;
+			
+			CSList_append_ref(result, match);
+		}
+	}
+	
+	return result;
+}
+
+C2Tuple * CSList_find_first_ref(CSList * list, int (*f)(CPointer)) {
+	CSList * found = CSList_find_first_n_ref(list, 1, f);
+	if (CSList_empty(found)) {
+		return NULL;
+	}
+	else {
+		C2Tuple * result = found->head->value;
+		CSList_free_nodes(found);
+		free(found);
+		
+		return result;
+	}
+}
+
+CSList * CSList_find_first_n_ref(CSList * list, int n, int (*f)(CPointer)) {
+	CSList * result = CSList_alloc(sizeof(C2Tuple));
+	
+	CSNode * cur;
+	int index;
+	int count;
+	
+	for (count = 1, index = 0, cur = list->head; count <= n && cur != NULL; index++, cur = cur->next) {
+		if (f(cur->value)) {
+			int * i = malloc(sizeof(int));
+			*i = index;
+			C2Tuple * match = malloc(sizeof(C2Tuple));
+			match->fst = i;
+			match->snd = cur->value;
+			
+			CSList_append_ref(result, match);
+			count++;
+		}
+	}
+	
+	return result;
+}
+
 CSList * CSList_reverse_ref(CSList * list) {
 	CSList * result = CSList_alloc(list->value_size);
 	for (CSNode * cur = list->head; cur != NULL; cur = cur->next) {
@@ -194,6 +252,55 @@ int CSList_iteri(CSList * list, void (*f)(CPointer val, int index)) {
     else {
         return -1;
     }
+}
+
+void CSList_iter2(CSList * list1, CSList * list2, void (*f)(CPointer, CPointer)) {
+	int len1 = CSList_length(list1);
+	int len2 = CSList_length(list2);
+	
+	if (len1 != len2 && len1 > 0) {
+		return;
+	}
+	else {
+		CSNode * cur1, * cur2;
+		for (cur1 = list1->head, cur2 = list2->head; cur1 != NULL && cur2 != NULL; cur1 = cur1->next, cur2 = cur2->next) {
+			f(cur1->value, cur2->value);
+		}
+	}
+}
+
+void CSList_iter2i(CSList * list1, CSList * list2, void (*f)(CPointer, CPointer, int)) {
+	int len1 = CSList_length(list1);
+	int len2 = CSList_length(list2);
+	
+	if (len1 != len2 && len1 > 0) {
+		return;
+	}
+	else {
+		CSNode * cur1, * cur2;
+		int i;
+		for (i = 0, cur1 = list1->head, cur2 = list2->head; cur1 != NULL && cur2 != NULL; i++, cur1 = cur1->next, cur2 = cur2->next) {
+			f(cur1->value, cur2->value, i);
+		}
+	}
+}
+
+void CSList_iter_where(CSList * list, void (*f)(CPointer), int (*p)(CPointer)) {
+	if (!CSList_empty(list)) {
+        CSNode * cur;
+        for (cur = list->head; cur != NULL; cur = cur->next) {
+            if (p(cur->value)) {
+            	f(cur->value);
+            }
+        }
+    }
+}
+
+void CSList_rev_iter(CSList * list, void (*f)(CPointer val)) {
+	CSList * rev = CSList_reverse_ref(list);
+	CSList_iter(rev, f);
+	CSList_free_nodes(rev);
+	free(rev);
 }
 
 CSList * CSList_map_ref(CSList * list, size_t dest_size, CPointer (*f)(CPointer val)) {
@@ -279,7 +386,7 @@ CSList * CSList_zip2_ref(CSList * fst, CSList * snd) {
 	}
 }
 
-unsigned int CSList_length(CSList * list) {
+int CSList_length(CSList * list) {
 	if (list == NULL) {
 		return -1;
 	}
@@ -316,4 +423,59 @@ CPointer * CSList_reduce_ref(CSList * list, CPointer init, size_t init_size, CPo
 		return result;
 	}
 
+}
+
+CSList * CSList_concat_ref(CSList * list1, CSList * list2) {
+	if (list1 == NULL && list2 == NULL) {
+		return NULL;
+	}
+	else if (list1 == NULL && list2 != NULL) {
+		return CSList_copy_nodes(list2);
+	}
+	else if (list1 != NULL && list2 == NULL) {
+		return CSList_copy_nodes(list1);
+	}
+	else if (list1->value_size != list2->value_size) {
+		return NULL;
+	}
+	else {
+		CSNode * cur2;
+		CSList * result = CSList_copy_nodes(list1);
+		for (cur2 = list2->head; cur2 != NULL; cur2 = cur2->next) {
+			CSList_append_ref(result, cur2->value);
+		}
+		
+		return result;
+	}
+}
+
+CSList * CSList_intersperse2_ref(CSList * list1, CSList * list2) {
+	if (list1 == NULL && list2 == NULL) {
+		return NULL;
+	}
+	else if (list1 == NULL && list2 != NULL) {
+		return NULL;
+	}
+	else if (list1 != NULL && list2 == NULL) {
+		return NULL;
+	}
+	else if (list1->value_size != list2->value_size) {
+		return NULL;
+	}
+	else {
+		CSNode * cur1, * cur2;
+		CSList * result = CSList_alloc(list1->value_size);
+		for (cur1 = list1->head, cur2 = list2->head; cur1 != NULL && cur2 != NULL; cur1 = cur1->next, cur2 = cur2->next) {
+			CSList_append_ref(result, cur1->value);
+			CSList_append_ref(result, cur2->value);
+		}
+		
+		if (cur1 == NULL && cur2 == NULL) {
+			return result;
+		}
+		else {
+			CSList_free_nodes(result);
+			return NULL;
+		}	
+	}
 }
