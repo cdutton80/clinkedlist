@@ -47,6 +47,7 @@ void CSList_append_cpy(CSList * list, CPointer val);
 void CSList_prepend_ref(CSList * list, CPointer val);
 void CSList_append_ref(CSList * list, CPointer val);
 
+int CSList_has(CSList * list, int (*f)(CPointer));
 CSList * CSList_find_ref(CSList * list, int (*f)(CPointer));
 C2Tuple * CSList_find_first_ref(CSList * list, int (*f)(CPointer));
 CSList * CSList_find_first_n_ref(CSList * list, int n, int (*f)(CPointer));
@@ -72,5 +73,11 @@ CSList * CSList_zip2_ref(CSList * fst, CSList * snd);
 CPointer * CSList_reduce_ref(CSList * list, CPointer init, size_t init_size, CPointer (*f)(CPointer, CPointer));
 
 int CSList_length(CSList * list);
+
+CPointer CSList_minimum_value(CSList * list, int (*f)(CPointer, CPointer));
+CPointer CSList_maximum_value(CSList * list, int (*f)(CPointer, CPointer));
+CSList * CSList_sort(CSList * list, int (*f)(CPointer, CPointer));
+
+CSList * CSList_uniq(CSList * list, int (*f)(CPointer, CPointer));
 
 #endif
