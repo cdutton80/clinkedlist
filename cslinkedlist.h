@@ -76,8 +76,13 @@ int CSList_length(CSList * list);
 
 CPointer CSList_minimum_value(CSList * list, int (*f)(CPointer, CPointer));
 CPointer CSList_maximum_value(CSList * list, int (*f)(CPointer, CPointer));
-CSList * CSList_sort(CSList * list, int (*f)(CPointer, CPointer));
+CSList * CSList_sort_ref(CSList * list, int (*f)(CPointer, CPointer));
 
-CSList * CSList_uniq(CSList * list, int (*f)(CPointer, CPointer));
+CSList * CSList_uniq_ref(CSList * list, int (*f)(CPointer, CPointer));
+
+int CSList_cmp_len_with(CSList * list, int len);
+
+CSList * CSList_group_by_ref(CSList * list, size_t key_size, CPointer (*keyf)(CPointer), int (*cmpf)(CPointer, CPointer));
+
 
 #endif
