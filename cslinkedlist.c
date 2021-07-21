@@ -514,8 +514,34 @@ CPointer CSList_maximum_value(CSList * list, int (*f)(CPointer, CPointer)) {
 	}
 }
 
-CSList * CSList_sort(CSList * list, int (*f)(CPointer, CPointer)) {
-	return list;
+CSList * CSList_sort_ref(CSList * list, int (*f)(CPointer, CPointer)) {
+	if (list == NULL || CSList_empty(list)) {
+		return NULL;
+	} 
+	else if (CSList_cmp_len_with(list, 1) == 0) {
+		return CSList_copy_nodes(list);
+	}
+	else {
+		CSList * result = CSList_copy_nodes(list);
+		CSNode * node = result->head;
+		CSNode * temp;
+
+		while (node != NULL) {
+			temp = node;
+			while (temp != NULL) {
+				if(f(node->value, temp->value) == 1) {
+					CPointer v = node->value;
+					node->value = temp->value;
+					temp->value = v;
+				}
+				temp = temp->next;
+			}
+			
+			node = node->next;
+		}
+
+		return result;
+	}
 }
 
 int CSList_has(CSList * list, int (*f)(CPointer)) {
@@ -533,8 +559,70 @@ int CSList_has(CSList * list, int (*f)(CPointer)) {
 	}
 }
 
-CSList * CSList_uniq(CSList * list, int (*f)(CPointer, CPointer)) {
-	CSList * result = CSList_alloc(list->value_size);
+CSList * CSList_uniq_ref(CSList * list, int (*f)(CPointer, CPointer)) {
+	if (list == NULL || CSList_empty(list)) {
+		return NULL;
+	}
+
+	CSList * sorted = CSList_sort_ref(list, f);
+	CSList * uniq = CSList_alloc(list->value_size);
+
+	for (CSNode * cur = sorted->head; cur != NULL; cur = cur->next) {
+		if (cur->next == NULL || f(cur->value, cur->next->value) != 0) {
+			CSList_append_ref(uniq, cur->value);
+		}
+	} 
+
+	CSList_free_nodes(sorted);
+	free(sorted);
+
+	return uniq;
+}
+
+int CSList_cmp_len_with(CSList * list, int len) {
+	CSNode * cur = list->head;
+	int count = 0;
+	while (cur != NULL) {
+		count++;
+		if (count > len) {
+			return 1;
+		}
+		else if (count == len && cur->next == NULL) {
+			return 0;
+		}
+
+		cur = cur->next;
+	}
 	
+	return -1;
+}
+
+CSList * CSList_group_by_ref(CSList * list, size_t key_size, CPointer (*keyf)(CPointer), int (*cmpf)(CPointer, CPointer)) {
+	CSList * map = CSList_map_ref(list, key_size, keyf);
+	CSList * uniq = CSList_uniq_ref(map, cmpf);
+	CSList * result = CSList_alloc(sizeof(C2Tuple));
+
+	CSList_free_nodes(map);
+	free(map);
+
+	for (CSNode * cur = uniq->head; cur != NULL; cur = cur->next) {
+		C2Tuple * t = malloc(sizeof(C2Tuple));
+		t->fst = cur->value;
+		t->snd = CSList_alloc(list->value_size);
+
+		for (CSNode * cur2 = list->head; cur2 != NULL; cur2 = cur2->next) {
+			if (cmpf(t->fst, keyf(cur2->value)) == 0) {
+				CSList_append_ref(t->snd, cur2->value);
+			}
+		}
+
+		CSList * temp = t->snd;
+		t->snd = CSList_sort_ref(t->snd, cmpf);
+		CSList_free_nodes(temp);
+		free(temp);
+
+		CSList_append_ref(result, t);
+	}
+
 	return result;
 }
