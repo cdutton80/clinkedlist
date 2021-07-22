@@ -61,8 +61,10 @@ void CSList_iter2i(CSList * list1, CSList * list2, void (*f)(CPointer, CPointer,
 void CSList_iter_where(CSList * list, void (*f)(CPointer), int (*p)(CPointer));
 void CSList_rev_iter(CSList * list, void (*f)(CPointer val));
 
-CSList * CSList_map_ref(CSList * list, size_t dest_size, CPointer (*f)(CPointer val));
-CSList * CSList_mapi_ref(CSList * list, size_t dest_size, CPointer (*f)(CPointer val, int));
+CSList * CSList_map_ref(CSList * list, size_t dest_size, CPointer (*f)(CPointer));
+CSList * CSList_mapi_ref(CSList * list, size_t dest_size, CPointer (*f)(CPointer, int));
+CSList * CSList_map2_ref(CSList * list1, CSList * list2, size_t dest_size, CPointer (*f)(CPointer, CPointer));
+CSList * CSList_map2i_ref(CSList * list1, CSList * list2,  size_t dest_size, CPointer (*f)(CPointer, CPointer, int));
 
 C2Tuple * CSList_partition_ref(CSList * list, int (*f)(CPointer));
 CSList * CSList_select_ref(CSList * list, int (*f)(CPointer));
@@ -83,6 +85,5 @@ CSList * CSList_uniq_ref(CSList * list, int (*f)(CPointer, CPointer));
 int CSList_cmp_len_with(CSList * list, int len);
 
 CSList * CSList_group_by_ref(CSList * list, size_t key_size, CPointer (*keyf)(CPointer), int (*cmpf)(CPointer, CPointer));
-
 
 #endif
