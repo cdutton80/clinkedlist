@@ -366,6 +366,27 @@ CSList * CSList_map2i_ref(CSList * list1, CSList * list2,  size_t dest_size, CPo
 	}
 }
 
+CSList * CSList_map_compose2_ref(CSList * list, size_t dest1_size, CPointer (*f1)(CPointer), size_t dest2_size, CPointer (*f2)(CPointer)) {
+	CSList * result1 = CSList_map_ref(list, dest1_size, f1);
+	CSList * result2 = CSList_map_ref(result1, dest2_size, f2);
+
+	CSList_free_nodes_and_values(result1);
+	free(result1);
+
+	return result2;
+}
+
+CSList * CSList_map_apply_to_2tuple_ref(CSList * list, size_t dest_size, CPointer (*f)(CPointer, CPointer)) {
+	CSList * result = CSList_alloc(dest_size);
+
+	for (CSNode * cur = list->head; cur != NULL; cur = cur->next) {
+		C2Tuple * t = (C2Tuple *)cur->value;
+		CSList_append_ref(result, f(t->fst, t->snd));
+	}
+
+	return result;
+}
+
 C2Tuple * CSList_partition_ref(CSList * list, int (*f)(CPointer)) {
 	CSList * trues = CSList_alloc(list->value_size);
 	CSList * falses = CSList_alloc(list->value_size);
@@ -664,4 +685,23 @@ CSList * CSList_group_by_ref(CSList * list, size_t key_size, CPointer (*keyf)(CP
 	}
 
 	return result;
+}
+
+void CSList_pad_to_eq_len_cpy(CSList * list1, CSList * list2, CPointer val) {
+	CSNode * cur1, * cur2;
+
+	for (cur1 = list1->head, cur2 = list2->head; cur1 != NULL || cur2 != NULL; ) {
+		if (cur1 == NULL) {
+			CSList_append_cpy(list1, val);
+			cur2 = cur2->next;
+		}
+		else if (cur2 == NULL) {
+			CSList_append_cpy(list2, val);
+			cur1 = cur1->next;
+		}
+		else {
+			cur1 = cur1->next;
+			cur2 = cur2->next;
+		}
+	}
 }
