@@ -327,6 +327,45 @@ CSList * CSList_mapi_ref(CSList * list, size_t dest_size, CPointer (*f)(CPointer
 	return result;
 }
 
+CSList * CSList_map2_ref(CSList * list1, CSList * list2, size_t dest_size, CPointer (*f)(CPointer, CPointer)) {
+	CSList * result = CSList_alloc(dest_size);
+	CSNode * cur1, *cur2;
+
+	for (cur1 = list1->head, cur2 = list2->head; cur1 != NULL && cur2 != NULL; cur1 = cur1->next, cur2 = cur2->next) {
+		CPointer fresult = f(cur1->value, cur2->value);
+		CSList_append_ref(result, fresult);
+	}
+
+	if (cur1 == NULL && cur2 == NULL) {
+		return result;
+	}
+	else {
+		CSList_free_nodes_and_values(result);
+		free(result);
+		return NULL;
+	}
+}
+
+CSList * CSList_map2i_ref(CSList * list1, CSList * list2,  size_t dest_size, CPointer (*f)(CPointer, CPointer, int)) {
+	CSList * result = CSList_alloc(dest_size);
+	CSNode * cur1, *cur2;
+	int i;
+
+	for (i = 0, cur1 = list1->head, cur2 = list2->head; cur1 != NULL && cur2 != NULL; i++, cur1 = cur1->next, cur2 = cur2->next) {
+		CPointer fresult = f(cur1->value, cur2->value, i);
+		CSList_append_ref(result, fresult);
+	}
+
+	if (cur1 == NULL && cur2 == NULL) {
+		return result;
+	}
+	else {
+		CSList_free_nodes_and_values(result);
+		free(result);
+		return NULL;
+	}
+}
+
 C2Tuple * CSList_partition_ref(CSList * list, int (*f)(CPointer)) {
 	CSList * trues = CSList_alloc(list->value_size);
 	CSList * falses = CSList_alloc(list->value_size);
