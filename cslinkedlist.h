@@ -66,6 +66,9 @@ CSList * CSList_mapi_ref(CSList * list, size_t dest_size, CPointer (*f)(CPointer
 CSList * CSList_map2_ref(CSList * list1, CSList * list2, size_t dest_size, CPointer (*f)(CPointer, CPointer));
 CSList * CSList_map2i_ref(CSList * list1, CSList * list2,  size_t dest_size, CPointer (*f)(CPointer, CPointer, int));
 
+CSList * CSList_map_compose2_ref(CSList * list, size_t dest1_size, CPointer (*f1)(CPointer), size_t dest2_size, CPointer (*f2)(CPointer));
+CSList * CSList_map_apply_to_2tuple_ref(CSList * list, size_t dest_size, CPointer (*f)(CPointer, CPointer));
+
 C2Tuple * CSList_partition_ref(CSList * list, int (*f)(CPointer));
 CSList * CSList_select_ref(CSList * list, int (*f)(CPointer));
 CSList * CSList_reject_ref(CSList * list, int (*f)(CPointer));
@@ -85,5 +88,7 @@ CSList * CSList_uniq_ref(CSList * list, int (*f)(CPointer, CPointer));
 int CSList_cmp_len_with(CSList * list, int len);
 
 CSList * CSList_group_by_ref(CSList * list, size_t key_size, CPointer (*keyf)(CPointer), int (*cmpf)(CPointer, CPointer));
+
+void CSList_pad_to_eq_len_cpy(CSList * list1, CSList * list2, CPointer val);
 
 #endif
