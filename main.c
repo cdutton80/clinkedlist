@@ -26,10 +26,10 @@ int main(void) {
     int one = 1;
     int two = 2;
     int eight = 8;
-    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    long int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
-    CSList * lst = CSList_alloc(sizeof(int));
-    CSList * lst2 = CSList_alloc(sizeof(int));
+    CSList * lst = CSList_alloc(sizeof(long int));
+    CSList * lst2 = CSList_alloc(sizeof(long int));
 
     for (int i = 0; i < 4; i++) {
         CSList_append_ref(lst, &arr[i]);
@@ -38,22 +38,12 @@ int main(void) {
     for (int i = 4; i < 8; i++) {
         CSList_append_ref(lst2, &arr[i]);
     }
-    
-    CSList * lst3 = CSList_intersperse2_ref(lst2, lst);
 
-    CSList_append_ref(lst3, &one);
-    CSList_append_ref(lst3, &two);
-    CSList_append_ref(lst3, &eight);
+    CSList * lst3 = CSList_zip2_ref(lst, lst2);
+    CSList * lst4 = CSList_map_apply_to_2tuple_ref(lst3, sizeof(int), int_add);
 
-
-
-
-    CSList * u = CSList_uniq_ref(lst3, cmp_int);
-
-
-    CSList * z = CSList_group_by_ref(lst3, sizeof(int), int_mod4, cmp_int);
-    
-    CSList_iter(z, print_int_intlist_tuple);
+    CSList_iter(lst3, print_intint_tuple);
+    CSList_iter(lst4, CSLU_int_println);
 }
 
 void print_int(CPointer val) {
