@@ -6,7 +6,6 @@
 #include "cslinkedlist.h"
 #include "c2tuple.h"
 
-
 int CSLU_int_cmp(CPointer v1, CPointer v2);
 int CSLU_int_eq(CPointer v1, CPointer v2);
 int CSLU_int_lt(CPointer v1, CPointer v2);
@@ -26,6 +25,7 @@ CPointer CSLU_int_mod(CPointer v1, CPointer v2);
 CPointer CSLU_int_to_flt(CPointer v1);
 void CSLU_int_println(CPointer val);
 void CSLU_int_println_idx(CPointer val, int index);
+CPointer CSLU_int_negate(CPointer val);
 
 int CSLU_flt_cmp(CPointer v1, CPointer v2);
 int CSLU_flt_eq(CPointer v1, CPointer v2);
@@ -40,10 +40,10 @@ CPointer CSLU_flt_sub(CPointer v1, CPointer v2);
 CPointer CSLU_flt_mul(CPointer v1, CPointer v2);
 CPointer CSLU_flt_div(CPointer v1, CPointer v2);
 CPointer CSLU_flt_pow(CPointer v1, CPointer v2);
-CPointer CSLU_flt_mod(CPointer v1, CPointer v2);
 CPointer CSLU_flt_to_int(CPointer v1);
 void CSLU_flt_println(CPointer val);
 void CSLU_flt_println_idx(CPointer val, int index);
+CPointer CSLU_flt_negate(CPointer val);
 
 void print_int_int_tuple(C2Tuple * t);
 void print_int_flt_tuple(C2Tuple * t);
@@ -51,7 +51,5 @@ void print_flt_flt_tuple(C2Tuple * t);
 void print_flt_int_tuple(C2Tuple * t);
 void print_int_intlist_tuple(C2Tuple * t);
 void print_int_fltlist_tuple(C2Tuple * t);
-
-
 
 #endif
